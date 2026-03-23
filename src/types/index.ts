@@ -56,3 +56,76 @@ export interface OnboardingState {
     };
   };
 }
+
+export type SessionStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'rescheduled';
+
+export interface Session {
+  id: string;
+  learnerId: string;
+  learnerName: string;
+  topic: string;
+  startTime: string;
+  duration: number; // in minutes
+  status: SessionStatus;
+  price: number;
+  currency: string;
+  meetingLink?: string;
+}
+
+export interface EarningsData {
+  totalEarned: number;
+  pendingPayout: number;
+  history: {
+    date: string;
+    amount: number;
+  }[];
+}
+
+export interface Activity {
+  id: string;
+  type: 'booking' | 'payment' | 'review' | 'system';
+  title: string;
+  description: string;
+  timestamp: string;
+  link?: string;
+}
+
+export interface MentorDashboardData {
+  upcomingSessions: Session[];
+  earnings: EarningsData;
+  performance: {
+    averageRating: number;
+    completionRate: number;
+    totalSessions: number;
+  };
+  recentReviews: Review[];
+  activities: Activity[];
+  profileCompletion: number;
+  pendingMessagesCount: number;
+}
+
+export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
+
+export interface PaymentTransaction {
+  id: string;
+  type: 'session' | 'subscription' | 'refund';
+  mentorId: string;
+  mentorName: string;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  date: string; // ISO date string
+  stellarTxHash: string;
+  description: string;
+  sessionId?: string;
+  sessionTopic?: string;
+}
+
+export interface PaymentAnalytics {
+  totalSpent: number;
+  totalCompleted: number;
+  totalPending: number;
+  totalRefunded: number;
+  totalFailed: number;
+  transactionCount: number;
+}
