@@ -2,6 +2,7 @@ import { useState } from 'react';
 import MentorOnboarding from './components/onboarding/MentorOnboarding';
 import LearnerOnboarding from './pages/LearnerOnboarding';
 import MentorWallet from './pages/MentorWallet';
+import LearningGoals from './pages/LearningGoals';
 import RatingBreakdown from './components/reviews/RatingBreakdown';
 import ReviewForm from './components/reviews/ReviewForm';
 import ReviewList from './components/reviews/ReviewList';
@@ -13,7 +14,7 @@ import AreaChart from './components/charts/AreaChart';
 import MetricCard from './components/charts/MetricCard';
 
 function App() {
-  const [view, setView] = useState<'onboarding' | 'learner' | 'wallet' | 'reviews' | 'analytics'>('onboarding');
+  const [view, setView] = useState<'onboarding' | 'learner' | 'wallet' | 'goals' | 'reviews' | 'analytics'>('onboarding');
   const [showForm, setShowForm] = useState(false);
   
   const { 
@@ -56,6 +57,14 @@ function App() {
               Learner Onboarding
             </button>
             <button
+              onClick={() => setView('goals')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                view === 'goals' ? 'bg-white shadow-sm text-stellar' : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              Goals
+            </button>
+            <button
               onClick={() => setView('wallet')}
               className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                 view === 'wallet' ? 'bg-white shadow-sm text-stellar' : 'text-gray-400 hover:text-gray-600'
@@ -91,6 +100,8 @@ function App() {
           <LearnerOnboarding />
         ) : view === 'wallet' ? (
           <MentorWallet />
+        ) : view === 'goals' ? (
+          <LearningGoals />
         ) : view === 'analytics' ? (
           <AnalyticsDashboard />
         ) : (
