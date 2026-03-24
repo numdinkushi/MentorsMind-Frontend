@@ -4,6 +4,8 @@ import LiveRegion from './components/a11y/LiveRegion';
 import AccessibilityPanel from './components/a11y/AccessibilityPanel';
 import MentorOnboarding from './components/onboarding/MentorOnboarding';
 import LearnerOnboarding from './pages/LearnerOnboarding';
+import MentorDashboard from './pages/MentorDashboard';
+import MentorSearch from './pages/MentorSearch';
 import RatingBreakdown from './components/reviews/RatingBreakdown';
 import ReviewForm from './components/reviews/ReviewForm';
 import ReviewList from './components/reviews/ReviewList';
@@ -13,9 +15,11 @@ import BarChart from './components/charts/BarChart';
 import PieChart from './components/charts/PieChart';
 import AreaChart from './components/charts/AreaChart';
 import MetricCard from './components/charts/MetricCard';
+import SearchPage from './pages/SearchPage';
 
 function App() {
-  const [view, setView] = useState<'onboarding' | 'learner' | 'reviews' | 'analytics'>('onboarding');
+  const [view, setView] = useState<'onboarding' | 'learner' | 'dashboard' | 'search' | 'reviews' | 'analytics'>('onboarding');
+  const [view, setView] = useState<'onboarding' | 'learner' | 'reviews' | 'analytics' | 'search'>('search');
   const [showForm, setShowForm] = useState(false);
   const [a11yOpen, setA11yOpen] = useState(false);
   const [announcement, setAnnouncement] = useState('');
@@ -62,6 +66,56 @@ function App() {
             <span className="font-bold text-xl tracking-tight">
               MentorMinds <span className="text-stellar">Stellar</span>
             </span>
+              Mentor Onboarding
+            </button>
+            <button
+              onClick={() => setView('learner')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                view === 'learner' ? 'bg-white shadow-sm text-stellar' : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              Learner Onboarding
+            </button>
+            <button
+              onClick={() => setView('dashboard')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                view === 'dashboard' ? 'bg-white shadow-sm text-stellar' : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              Mentor Dashboard
+            </button>
+            <button
+              onClick={() => setView('search')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                view === 'search' ? 'bg-white shadow-sm text-stellar' : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              Find Mentors
+            </button>
+            <button
+              onClick={() => setView('analytics')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                view === 'analytics' ? 'bg-white shadow-sm text-stellar' : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              Analytics
+            </button>
+            <button
+              onClick={() => setView('reviews')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                view === 'reviews' ? 'bg-white shadow-sm text-stellar' : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              Ratings & Reviews
+            </button>
+            <button
+              onClick={() => setView('search')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                view === 'search' ? 'bg-white shadow-sm text-stellar' : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              Search & Discovery
+            </button>
           </div>
 
           {/* View switcher */}
@@ -115,8 +169,14 @@ function App() {
           <MentorOnboarding />
         ) : view === 'learner' ? (
           <LearnerOnboarding />
+        ) : view === 'dashboard' ? (
+          <MentorDashboard />
+        ) : view === 'search' ? (
+          <MentorSearch />
         ) : view === 'analytics' ? (
           <AnalyticsDashboard />
+        ) : view === 'search' ? (
+          <SearchPage />
         ) : (
           <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex justify-between items-end">
@@ -260,28 +320,3 @@ function AnalyticsDashboard() {
 }
 
 export default App;
-# Tasks
-
-- [x] Planning Phase
-    - [x] Research existing codebase
-    - [x] Create implementation plan
-- [x] Implement `useMentorDashboard` Hook
-    - [x] Define types for dashboard data
-    - [x] Create mock data and hook logic
-- [x] Create Dashboard Components
-    - [x] `EarningsOverview.tsx` (with charts)
-    - [x] `PerformanceMetrics.tsx`
-    - [x] `UpcomingSessions.tsx` (with actions)
-    - [x] `RecentReviews.tsx`
-    - [x] `ActivityFeed.tsx`
-- [x] Create `MentorDashboard.tsx` Page
-    - [x] Integrate all components
-    - [x] Add responsiveness and premium design elements
-- [/] Integrating Dashboard into App and Cleanup
-    - [/] Update `App.tsx`
-    - [/] Cleanup misplaced files
-- [ ] Testing and Verification
-    - [ ] Dashboard render tests
-    - [ ] Session management tests
-    - [ ] Earnings display tests
-- [ ] Final Walkthrough
