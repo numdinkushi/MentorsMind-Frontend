@@ -18,8 +18,7 @@ export default class SessionService {
     return request<{ status: string }>(
       {
         method: "GET",
-        url: apiConfig.url.sessions,
-        data: { id },
+        url: `${apiConfig.url.sessions}/${id}`,
       },
       opts,
     );
@@ -30,7 +29,7 @@ export default class SessionService {
       {
         method: "GET",
         url: apiConfig.url.sessions,
-        data: { args },
+        params: { args },
       },
       opts,
     );
