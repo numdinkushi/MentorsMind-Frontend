@@ -1,10 +1,11 @@
+import { apiConfig } from "../config/api.config";
 import { request } from "./request";
 
 export default class SessionService {
   async create(mentorId: string) {
     return request<{ status: string }>({
       method: "POST",
-      url: "/sessions",
+      url: apiConfig.url.sessions,
       data: { mentorId },
     });
   }
@@ -13,7 +14,7 @@ export default class SessionService {
     return request<{ status: string }>(
       {
         method: "GET",
-        url: "/sessions",
+        url: apiConfig.url.sessions,
         data: { id },
       },
       true,
@@ -24,7 +25,7 @@ export default class SessionService {
     return request<{ status: string }>(
       {
         method: "GET",
-        url: "/sessions",
+        url: apiConfig.url.sessions,
         data: { args },
       },
       true,

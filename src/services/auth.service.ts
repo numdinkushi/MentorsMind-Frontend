@@ -1,10 +1,11 @@
+import { apiConfig } from "../config/api.config";
 import { request } from "./request";
 
 export default class AuthService {
   async login(email: string, password: string) {
     return request<{ accessToken: string; refreshToken: string }>({
       method: "POST",
-      url: "/auth/login",
+      url: apiConfig.url.auth.login,
       data: { email, password },
     });
   }
@@ -12,7 +13,7 @@ export default class AuthService {
   async signup(email: string, password: string) {
     return request<{ accessToken: string; refreshToken: string }>({
       method: "POST",
-      url: "/auth/signup",
+      url: apiConfig.url.auth.signup,
       data: { email, password },
     });
   }
@@ -21,7 +22,7 @@ export default class AuthService {
     return request<{ id: string; email: string }>(
       {
         method: "GET",
-        url: "/auth/me",
+        url: apiConfig.url.auth.me,
       },
       true,
     );
