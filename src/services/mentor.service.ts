@@ -1,5 +1,5 @@
 import { apiConfig } from "../config/api.config";
-import { request } from "./request";
+import { request } from "../utils/request.utils";
 
 export default class MentorService {
   async getMentors() {
@@ -8,7 +8,9 @@ export default class MentorService {
         method: "GET",
         url: apiConfig.url.mentors,
       },
-      true,
+      {
+        useCache: true,
+      },
     );
   }
 
@@ -19,10 +21,12 @@ export default class MentorService {
         url: apiConfig.url.mentors,
         data: { id },
       },
-      true,
+      {
+        useCache: true,
+      },
     );
   }
-  
+
   async add(args: Record<string, unknown>) {
     return request<{ id: string; name: string }[]>({
       method: "POST",

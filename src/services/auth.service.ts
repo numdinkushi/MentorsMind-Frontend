@@ -1,5 +1,5 @@
 import { apiConfig } from "../config/api.config";
-import { request } from "./request";
+import { request } from "../utils/request.utils";
 
 export default class AuthService {
   async login(email: string, password: string) {
@@ -24,7 +24,9 @@ export default class AuthService {
         method: "GET",
         url: apiConfig.url.auth.me,
       },
-      true,
+      {
+        useCache: true,
+      },
     );
   }
 }

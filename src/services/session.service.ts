@@ -1,5 +1,5 @@
 import { apiConfig } from "../config/api.config";
-import { request } from "./request";
+import { request } from "../utils/request.utils";
 
 export default class SessionService {
   async create(mentorId: string) {
@@ -17,7 +17,9 @@ export default class SessionService {
         url: apiConfig.url.sessions,
         data: { id },
       },
-      true,
+      {
+        useCache: true,
+      },
     );
   }
 
@@ -28,7 +30,9 @@ export default class SessionService {
         url: apiConfig.url.sessions,
         data: { args },
       },
-      true,
+      {
+        useCache: true,
+      },
     );
   }
 }
