@@ -17,8 +17,7 @@ export default class MentorService {
     return request<{ id: string; name: string }[]>(
       {
         method: "GET",
-        url: apiConfig.url.mentors,
-        data: { id },
+        url: `${apiConfig.url.mentors}/${id}`,
       },
       opts,
     );
