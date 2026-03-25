@@ -104,16 +104,24 @@ const MentorDashboard: React.FC = () => {
 
         {/* Main Content Area */}
         <div className="lg:col-span-3 space-y-8">
-          <div className="flex items-center gap-4 border-b border-gray-100 pb-2 overflow-x-auto no-scrollbar">
-            {(['overview', 'sessions', 'earnings'] as const).map((tab) => (
+<div className="flex items-center gap-4 border-b border-gray-100 pb-2 overflow-x-auto no-scrollbar">
+            {(['overview', 'sessions', 'earnings', 'manage'] as const).map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  if (tab === 'manage') {
+                    window.location.href = '/mentor/sessions';
+                    return;
+                  }
+                  setActiveTab(tab);
+                }}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
-                  activeTab === tab ? 'bg-stellar text-white shadow-lg shadow-stellar/20' : 'text-gray-400 hover:text-gray-600'
+                  activeTab === tab || (tab === 'manage' && window.location.pathname.includes('/mentor/sessions')) 
+                    ? 'bg-stellar text-white shadow-lg shadow-stellar/20' 
+                    : 'text-gray-400 hover:text-gray-600'
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'manage' ? 'Manage Sessions' : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>

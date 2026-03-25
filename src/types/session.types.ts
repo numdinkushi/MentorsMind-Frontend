@@ -15,6 +15,16 @@ export interface SessionHistoryItem {
   outcome?: 'excellent' | 'good' | 'needs-improvement';
 }
 
+export interface ExtendedSession {
+  notes?: string;
+  cancelReason?: string;
+  checklist: boolean[];
+  feedback?: string;
+  paymentStatus: 'pending' | 'paid' | 'refunded';
+  learnerAvatar?: string;
+  learnerBio?: string;
+}
+
 export interface LearningAnalytics {
   totalSessions: number;
   totalTimeInvested: number; // in minutes
