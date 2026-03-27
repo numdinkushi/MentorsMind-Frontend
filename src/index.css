@@ -208,6 +208,17 @@
   animation: check-draw 0.4s ease-out 0.1s forwards;
 }
 
+@keyframes confetti-fall {
+  to {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0.35;
+  }
+}
+
+.animate-confetti-fall {
+  animation: confetti-fall 1s ease-out forwards;
+}
+
 /* Respect reduced motion for all custom animations */
 @media (prefers-reduced-motion: reduce) {
   .animate-shimmer,
@@ -215,7 +226,8 @@
   .animate-bounce-in,
   .animate-float,
   .animate-spin-slow,
-  .animate-check-draw {
+  .animate-check-draw,
+  .animate-confetti-fall {
     animation: none !important;
   }
 }

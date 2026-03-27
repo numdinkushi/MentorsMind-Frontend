@@ -98,3 +98,5 @@ export const AreaChartComponent: React.FC<Props> = ({
   );
 };
 
+export default AreaChartComponent;
+

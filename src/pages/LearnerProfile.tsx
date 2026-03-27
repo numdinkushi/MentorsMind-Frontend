@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useLearnerProfile } from '../hooks/useLearnerProfile';
 import { ProfileForm } from '../components/learner/ProfileForm';
-import { AchievementBadges } from '../components/learner/AchievementBadges';
+import AchievementBadges from '../components/learner/AchievementBadges';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { Navbar } from '../components/navigation/Navbar';
-import { Edit2, User, Target, Award, Settings } from 'lucide-react';
+import { Edit2, User as UserIcon, Target, Award, Settings } from 'lucide-react';
+import type { AuthState, User as AppUser } from '../types';
 
 export const LearnerProfilePage: React.FC = () => {
   const { profile, updateProfile, uploadPhoto, isLoading } = useLearnerProfile();
@@ -18,11 +19,24 @@ export const LearnerProfilePage: React.FC = () => {
     );
   }
 
+  const navAuth: AuthState = {
+    isAuthenticated: true,
+    isLoading: false,
+    user: {
+      id: profile.id,
+      name: profile.fullName,
+      email: profile.email,
+      role: 'learner',
+      avatar: profile.avatarUrl,
+      emailVerified: true,
+    } as AppUser,
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Navbar />
+        <Navbar auth={navAuth} onLogout={() => {}} />
         <main className="flex-1 overflow-y-auto focus:outline-none">
           <div className="py-6 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
@@ -54,7 +68,7 @@ export const LearnerProfilePage: React.FC = () => {
                   >
                     {isEditing ? (
                       <>
-                        <User className="h-4 w-4 mr-2" />
+                        <UserIcon className="h-4 w-4 mr-2" />
                         View Profile
                       </>
                     ) : (
@@ -84,7 +98,7 @@ export const LearnerProfilePage: React.FC = () => {
                     {/* Bio and Intro */}
                     <section className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
                       <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <User className="h-5 w-5 mr-2 text-blue-500" />
+                        <UserIcon className="h-5 w-5 mr-2 text-blue-500" />
                         About Me
                       </h2>
                       <div className="prose prose-sm text-gray-500 max-w-none">
@@ -117,7 +131,7 @@ export const LearnerProfilePage: React.FC = () => {
                         <Award className="h-5 w-5 mr-2 text-blue-500" />
                         Achievements
                       </h2>
-                      <AchievementBadges />
+                      <AchievementBadges achievements={profile.achievements} />
                     </section>
                   </div>
 

@@ -44,6 +44,8 @@ const ProposalDetail = lazy(loadProposalDetail);
 const MentorProfileSetup = lazy(() => loadMentorProfileSetup().then(m => ({ default: m.MentorProfileSetup })));
 const LearningGoals = lazy(loadLearningGoals);
 const MentorDashboard = lazy(() => import('./pages/MentorDashboard'));
+const DashboardHome = lazy(() => import('./pages/DashboardHome'));
+const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const RatingBreakdown = lazy(loadRatingBreakdown);
 const ReviewForm = lazy(loadReviewForm);
 const ReviewList = lazy(loadReviewList);
@@ -188,6 +190,7 @@ function App() {
     settings: loadSettings,
     goals: loadLearningGoals,
     dashboard: () => Promise.resolve(),
+    'learner-profile': loadLearnerProfile,
   };
 
   const fallback = <div className="flex h-64 items-center justify-center">Loading...</div>;
@@ -313,6 +316,22 @@ function App() {
             }
           />
           <Route
+            path="/dashboard"
+            element={
+              <Suspense fallback={fallback}>
+                <DashboardHome />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <Suspense fallback={fallback}>
+                <Leaderboard />
+              </Suspense>
+            }
+          />
+          <Route
             path="*"
             element={
               <Suspense fallback={fallback}>
@@ -432,3 +451,5 @@ function App() {
     </div>
   );
 }
+
+export default App;

@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useReminders } from '../hooks/useReminders';
 import { useRecommendations } from '../hooks/useRecommendations';
 import { useDashboard } from '../hooks/useDashboard';
 import { usePostSessionReview } from '../hooks/usePostSessionReview';
 import { useAchievements } from '../hooks/useAchievements';
+import { useStreak } from '../hooks/useStreak';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { DashboardGrid } from '../components/dashboard/DashboardGrid';
 import { Widget } from '../components/dashboard/Widget';
@@ -12,10 +14,12 @@ import UpcomingReminders from '../components/learner/UpcomingReminders';
 import LearningRecommendations from '../components/learner/LearningRecommendations';
 import SessionPrep from '../components/learner/SessionPrep';
 import RecommendedMentors from '../components/learner/RecommendedMentors';
-import LearningStreak from '../components/learner/LearningStreak';
 import AchievementBadges from '../components/learner/AchievementBadges';
 import ProgressRing from '../components/learner/ProgressRing';
 import MilestoneModal from '../components/learner/MilestoneModal';
+import StreakWidget from '../components/learner/StreakWidget';
+import StreakCalendar from '../components/learner/StreakCalendar';
+import MilestoneProgress from '../components/learner/MilestoneProgress';
 import PostSessionReview from '../components/session/PostSessionReview';
 import type { Session, SessionHistoryItem } from '../types';
 
@@ -62,7 +66,7 @@ const MOCK_COMPLETED_SESSIONS: SessionHistoryItem[] = [
   },
 ];
 
-const LearnerDashboardContent: React.FC = () => {
+export const LearnerDashboardContent: React.FC = () => {
   const {
     settings,
     upcomingReminders,
@@ -88,9 +92,7 @@ const LearnerDashboardContent: React.FC = () => {
   const {
     progress,
     streakDays,
-    streakWeeks,
     totalHours,
-    unlockedAchievements,
     achievementPercent,
     nextAchievement,
     isLeaderboardOptIn,
@@ -102,6 +104,22 @@ const LearnerDashboardContent: React.FC = () => {
     exportProgressReport,
     closeMilestoneModal,
   } = useAchievements();
+
+  const {
+    currentWeekStreak,
+    heatGrid,
+    mntEarnedTotal,
+    unclaimedMnt,
+    claimUnclaimedMnt,
+    milestoneSessions,
+    milestoneTarget,
+    milestoneBonus,
+    streakBroken,
+    dismissStreakBroken,
+    celebrationOpen,
+    celebrationMessage,
+    closeCelebration,
+  } = useStreak({ sessionsCompleted: progress.sessionsCompleted });
 
   const { pendingSession, submitted, updatedRating, submitReview, dismissForNow, close } =
     usePostSessionReview(MOCK_COMPLETED_SESSIONS);
@@ -152,56 +170,137 @@ const LearnerDashboardContent: React.FC = () => {
         visible={isMilestoneModalVisible}
         message={milestoneCelebration}
         onClose={closeMilestoneModal}
+        withCelebration
       />
 
-      <section className="grid gap-6 md:grid-cols-3">
-        <LearningStreak
-          streakDays={streakDays}
-          streakWeeks={streakWeeks}
-          totalHours={totalHours}
-          nextGoal={nextAchievement?.title}
-        />
+      <MilestoneModal
+        visible={celebrationOpen}
+        message={celebrationMessage}
+        onClose={closeCelebration}
+        withCelebration
+      />
 
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-bold text-gray-900">Goal Progress</h3>
-          <p className="text-sm text-gray-500">Weekly goal and achievement completion.</p>
+      {streakBroken ? (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 dark:border-amber-900/50 dark:bg-amber-950/30"
+        >
+          <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
+            Your streak ended. Start a new one!
+          </p>
+          <button
+            type="button"
+            onClick={dismissStreakBroken}
+            className="shrink-0 rounded-xl bg-white px-4 py-2 text-xs font-bold text-amber-900 shadow-sm ring-1 ring-amber-200 hover:bg-amber-100 dark:bg-gray-900 dark:text-amber-100 dark:ring-amber-800"
+          >
+            Dismiss
+          </button>
+        </div>
+      ) : null}
+
+      <section className="grid gap-6 lg:grid-cols-3">
+        <StreakWidget streakWeeks={currentWeekStreak} />
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">MNT from streaks</h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Total earned: <span className="font-bold text-gray-900 dark:text-white">{mntEarnedTotal} MNT</span>
+          </p>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            Unclaimed:{' '}
+            <span className="font-black text-amber-600 dark:text-amber-400">{unclaimedMnt} MNT</span>
+          </p>
+          <button
+            type="button"
+            disabled={unclaimedMnt <= 0}
+            onClick={claimUnclaimedMnt}
+            className="mt-4 w-full rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Claim rewards
+          </button>
+        </div>
+
+        <MilestoneProgress
+          currentSessions={milestoneSessions}
+          targetSessions={milestoneTarget}
+          bonusMnt={milestoneBonus}
+        />
+      </section>
+
+      <section>
+        <StreakCalendar heatGrid={heatGrid} />
+      </section>
+
+      <section className="grid gap-6 md:grid-cols-3">
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 md:col-span-1">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Streak detail</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Consecutive days & hours invested</p>
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/30 p-4 text-center">
+              <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">Days</p>
+              <p className="mt-1 text-3xl font-black text-gray-900 dark:text-white">{streakDays}</p>
+            </div>
+            <div className="rounded-xl bg-amber-50 dark:bg-amber-950/30 p-4 text-center">
+              <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">Hours</p>
+              <p className="mt-1 text-3xl font-black text-gray-900 dark:text-white">{totalHours}h</p>
+            </div>
+          </div>
+          {nextAchievement?.title ? (
+            <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
+              Next badge: <span className="font-semibold">{nextAchievement.title}</span>
+            </p>
+          ) : null}
+        </div>
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Goal Progress</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Weekly goal and achievement completion.</p>
           <div className="mt-4 flex items-center justify-center">
             <ProgressRing value={achievementPercent} />
           </div>
           <div className="mt-4 flex flex-col gap-2">
             <button
+              type="button"
               onClick={exportProgressCard}
               className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
             >
               Export Progress Card
             </button>
             <button
+              type="button"
               onClick={exportProgressReport}
-              className="rounded-xl border border-blue-600 px-4 py-2 text-sm font-bold text-blue-600 hover:bg-blue-50"
+              className="rounded-xl border border-blue-600 px-4 py-2 text-sm font-bold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20"
             >
               Download Progress Report
             </button>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-gray-900">Leaderboard</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Leaderboard</h3>
             <span className="text-xs text-slate-400">Opt-in</span>
           </div>
           <div className="mt-4 flex items-center justify-between text-sm font-semibold">
-            <span>{isLeaderboardOptIn ? 'Enabled' : 'Disabled'}</span>
+            <span className="text-gray-700 dark:text-gray-200">{isLeaderboardOptIn ? 'Enabled' : 'Disabled'}</span>
             <button
+              type="button"
               onClick={toggleLeaderboardOptIn}
               className={`rounded-lg px-3 py-1 text-xs font-bold ${
                 isLeaderboardOptIn
                   ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200'
               }`}
             >
               {isLeaderboardOptIn ? 'Opt Out' : 'Opt In'}
             </button>
           </div>
+          <Link
+            to="/leaderboard"
+            className="mt-4 flex w-full items-center justify-center rounded-xl border border-blue-600 px-4 py-2.5 text-sm font-bold text-blue-600 hover:bg-blue-50 dark:border-blue-500 dark:text-blue-400 dark:hover:bg-blue-950/30"
+          >
+            View streak leaderboard
+          </Link>
         </div>
       </section>
 

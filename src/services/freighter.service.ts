@@ -1,4 +1,4 @@
-import { Networks, Transaction, TransactionBuilder } from 'stellar-sdk';
+import { Networks, Transaction, TransactionBuilder } from '@stellar/stellar-sdk';
 
 export interface FreighterModule {
   isConnected(): Promise<boolean>;

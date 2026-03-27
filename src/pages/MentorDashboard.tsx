@@ -24,7 +24,7 @@ const MentorDashboardInner: React.FC<{ nextSessionTime?: string }> = ({ nextSess
   ) : null;
 };
 
-const MentorDashboardContent: React.FC = () => {
+export const MentorDashboardContent: React.FC = () => {
   const {
     data,
     confirmSession,
