@@ -2,10 +2,13 @@ import React, { useEffect } from 'react';
 import { useReminders } from '../hooks/useReminders';
 import { useRecommendations } from '../hooks/useRecommendations';
 import { useDashboard } from '../hooks/useDashboard';
+import { useAuth } from '../hooks/useAuth';
+import { useOnboardingProgress } from '../hooks/useOnboardingProgress';
 import { usePostSessionReview } from '../hooks/usePostSessionReview';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { DashboardGrid } from '../components/dashboard/DashboardGrid';
 import { Widget } from '../components/dashboard/Widget';
+import OnboardingChecklist from '../components/onboarding/OnboardingChecklist';
 import ReminderSettings from '../components/learner/ReminderSettings';
 import UpcomingReminders from '../components/learner/UpcomingReminders';
 import LearningRecommendations from '../components/learner/LearningRecommendations';
@@ -79,6 +82,13 @@ const LearnerDashboardContent: React.FC = () => {
   } = useRecommendations();
 
   const { setRole, setLoading, widgets } = useDashboard();
+  const { user } = useAuth();
+
+  // Initialize onboarding progress
+  const onboarding = useOnboardingProgress({
+    role: 'learner',
+    userCreatedAt: user?.createdAt,
+  });
 
   const { pendingSession, submitted, updatedRating, submitReview, dismissForNow, close } =
     usePostSessionReview(MOCK_COMPLETED_SESSIONS);
@@ -124,6 +134,25 @@ const LearnerDashboardContent: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {/* Onboarding Checklist Widget */}
+      {onboarding.shouldDisplay && (
+        <OnboardingChecklist
+          items={onboarding.items}
+          progressPercentage={onboarding.progressPercentage}
+          completedCount={onboarding.completedCount}
+          totalCount={onboarding.totalCount}
+          isDismissed={onboarding.isDismissed}
+          isCompleted={onboarding.isCompleted}
+          shouldDisplay={onboarding.shouldDisplay}
+          onMarkItemComplete={onboarding.markItemComplete}
+          onDismiss={onboarding.dismissWidget}
+          onResume={onboarding.resumeWidget}
+          onReset={onboarding.resetOnboarding}
+          role="learner"
+          userEmail={user?.email}
+        />
+      )}
 
       <DashboardGrid>
         {widgets
