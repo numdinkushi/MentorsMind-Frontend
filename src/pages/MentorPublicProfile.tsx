@@ -4,6 +4,8 @@ import ProfileHeader from '../components/mentor/ProfileHeader';
 import RatingBreakdown from '../components/mentor/RatingBreakdown';
 import PublicAvailability from '../components/mentor/PublicAvailability';
 import ReviewsList from '../components/mentor/ReviewsList';
+import { EndorsementSection } from '../components/profile/EndorsementSection';
+import { useEndorsements } from '../hooks/useEndorsements';
 
 const mentor = {
   name: 'John Doe',
@@ -41,6 +43,14 @@ export default function MentorPublicProfile() {
     };
   }, []);
 
+  const {
+    endorsements,
+    pendingSkill,
+    requestEndorsement,
+    cancelRequest,
+    toggleEndorsement,
+  } = useEndorsements(true);
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
 
@@ -51,6 +61,16 @@ export default function MentorPublicProfile() {
         sessionCount={mentor.sessionCount}
         learnerCount={mentor.learnerCount}
         verified={mentor.verified}
+      />
+
+      <EndorsementSection
+        name={mentor.name}
+        endorsements={endorsements}
+        hasCompletedSession={true}
+        pendingSkill={pendingSkill}
+        onRequestEndorsement={requestEndorsement}
+        onToggleEndorsement={toggleEndorsement}
+        onCancelRequest={cancelRequest}
       />
 
       <RatingBreakdown />
