@@ -4,6 +4,7 @@ import { useOnlineStatus } from './hooks/useOnlineStatus';
 import OfflineBanner from './components/ui/OfflineBanner';
 import NetworkErrorToast from './components/ui/NetworkErrorToast';
 import SkipNavigation from './components/a11y/SkipNavigation';
+import NotificationCenter from './components/notifications/NotificationCenter';
 import LiveRegion from './components/a11y/LiveRegion';
 import AccessibilityPanel from './components/a11y/AccessibilityPanel';
 import { useReviews } from './hooks/useReviews';
@@ -215,6 +216,9 @@ function App() {
             <span className="text-xl font-bold tracking-tight">
               MentorMinds <span className="text-stellar">Stellar</span>
             </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <NotificationCenter />
           </div>
         </div>
 
