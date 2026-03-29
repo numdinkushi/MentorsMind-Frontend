@@ -26,6 +26,14 @@ export default class AuthService {
   }
 
   async me(opts?: RequestOptions) {
+<<<<<<< fix/89-email-notification-preferences-ui
+    const config = {
+      method: "GET",
+      url: apiConfig.url.auth.me,
+    } as const;
+
+    return opts ? request<{ id: string; email: string }>(config, opts) : request(config);
+=======
     return request<User>(
       {
         method: "GET",
@@ -33,6 +41,7 @@ export default class AuthService {
       },
       opts,
     );
+>>>>>>> main
   }
 
   async logout(opts?: RequestOptions) {

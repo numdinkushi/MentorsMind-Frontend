@@ -24,3 +24,7 @@ export interface AggregatedData {
   skillBreakdown: ChartDatum[];
   metrics: EarningsMetrics;
 }
+</xai:function_call >
+
+<xai:function_call name="create_file">
+<parameter name="absolute_path">src/hooks/useEarningsData.ts
