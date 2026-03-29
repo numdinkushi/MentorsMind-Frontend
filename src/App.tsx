@@ -1,5 +1,5 @@
 import React, { lazy, useEffect, useState, Suspense } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useParams } from 'react-router-dom';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import OfflineBanner from './components/ui/OfflineBanner';
 import NetworkErrorToast from './components/ui/NetworkErrorToast';
@@ -152,6 +152,18 @@ function AnalyticsDashboard() {
         />
       </div>
     </div>
+  );
+}
+
+function SessionJoinDeepLink() {
+  const { token } = useParams<{ token: string }>();
+
+  return (
+    <SessionRoom
+      sessionId={token ?? 'invite'}
+      sessionTopic="MentorMinds Session Invite"
+      mentorName="Mentor"
+    />
   );
 }
 
@@ -375,6 +387,14 @@ function App() {
             element={
               <Suspense fallback={fallback}>
                 <MentorSessions isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/sessions/join/:token"
+            element={
+              <Suspense fallback={fallback}>
+                <SessionJoinDeepLink />
               </Suspense>
             }
           />
