@@ -1,13 +1,14 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import React, { lazy, useEffect, useState, Suspense } from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
+import OfflineBanner from './components/ui/OfflineBanner';
+import NetworkErrorToast from './components/ui/NetworkErrorToast';
 import SkipNavigation from './components/a11y/SkipNavigation';
 import LiveRegion from './components/a11y/LiveRegion';
 import AccessibilityPanel from './components/a11y/AccessibilityPanel';
-import InstallPrompt from './components/mobile/InstallPrompt';
-import MobileDashboard from './components/mobile/MobileDashboard';
-import OfflineBanner from './components/ui/OfflineBanner';
-import NetworkErrorToast from './components/ui/NetworkErrorToast';
-import { useOnlineStatus } from './hooks/useOnlineStatus';
+import CookieBanner from './components/compliance/CookieBanner';
+import TermsAcceptance from './components/compliance/TermsAcceptance';
+import { useReviews } from './hooks/useReviews';
 import { usePerformance } from './hooks/usePerformance';
 import { useReviews } from './hooks/useReviews';
 import { preloadCriticalResources } from './utils/performance.utils';
@@ -27,7 +28,11 @@ const loadReviewForm = () => import('./components/reviews/ReviewForm');
 const loadReviewList = () => import('./components/reviews/ReviewList');
 const loadMentorPublicProfile = () => import('./pages/MentorPublicProfile');
 const loadLearnerProfile = () => import('./pages/LearnerProfile');
-const loadMentorDashboard = () => import('./pages/MentorDashboard');
+const loadMentorAnalyticsPage = () => import('./pages/MentorAnalytics');
+const loadLearnerAnalyticsPage = () => import('./pages/LearnerAnalytics');
+const loadPlatformStats = () => import('./pages/PlatformStats');
+const loadPrivacyPolicy = () => import('./pages/PrivacyPolicy');
+const loadTermsOfService = () => import('./pages/TermsOfService');
 
 const MentorPublicProfile = lazy(loadMentorPublicProfile);
 const LearnerProfile = lazy(() =>
@@ -268,6 +273,86 @@ function App() {
       >
         <Routes>
           <Route
+            path="/dashboard"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorDashboard />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/wallet"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorWallet isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorSearch isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/sessions"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorSessions isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/mentor/analytics"
+            element={
+              <Suspense fallback={fallback}>
+                <MentorAnalyticsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/learner/analytics"
+            element={
+              <Suspense fallback={fallback}>
+                <LearnerAnalyticsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/stats"
+            element={
+              <Suspense fallback={fallback}>
+                <PlatformStatsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/privacy"
+            element={
+              <Suspense fallback={fallback}>
+                <PrivacyPolicyPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/terms"
+            element={
+              <Suspense fallback={fallback}>
+                <TermsOfServicePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <Suspense fallback={fallback}>
+                <Settings />
+              </Suspense>
+            }
+          />
+          <Route
             path="/mentors/:id"
             element={
               <Suspense fallback={fallback}>
@@ -420,8 +505,23 @@ function App() {
         </div>
       </aside>
 
-      <footer className="fixed bottom-0 left-0 right-0 border-t border-gray-100 bg-white/80 py-4 text-center text-[10px] text-gray-400 backdrop-blur-sm">
-        Demo Version 1.0 • Built with Vite, React & Tailwind CSS • Powered by Stellar
+      <CookieBanner />
+
+      <footer className="fixed bottom-0 left-0 right-0 border-t border-gray-100 bg-white/85 py-3 text-[10px] text-gray-500 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-1 px-4 md:flex-row">
+          <span>Demo Version 1.0 • Built with Vite, React & Tailwind CSS • Powered by Stellar</span>
+          <div className="flex items-center gap-3">
+            <Link to="/privacy" className="font-semibold text-gray-600 hover:text-stellar">Privacy Policy</Link>
+            <Link to="/terms" className="font-semibold text-gray-600 hover:text-stellar">Terms of Service</Link>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('open-cookie-preferences'))}
+              className="font-semibold text-gray-600 hover:text-stellar"
+            >
+              Cookie Preferences
+            </button>
+          </div>
+        </div>
       </footer>
     </div>
   );
