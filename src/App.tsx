@@ -1,45 +1,49 @@
-import React, { lazy, useEffect, useState, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
-import { useOnlineStatus } from "./hooks/useOnlineStatus";
-import OfflineBanner from "./components/ui/OfflineBanner";
-import NetworkErrorToast from "./components/ui/NetworkErrorToast";
-import SkipNavigation from "./components/a11y/SkipNavigation";
-import LiveRegion from "./components/a11y/LiveRegion";
-import AccessibilityPanel from "./components/a11y/AccessibilityPanel";
-import { useReviews } from "./hooks/useReviews";
-import { usePerformance } from "./hooks/usePerformance";
-import { preloadCriticalResources } from "./utils/performance.utils";
-import MetricCard from "./components/charts/MetricCard";
+import React, { lazy, useEffect, useState, Suspense } from 'react';
+import { Routes, Route, Link, useParams } from 'react-router-dom';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
+import OfflineBanner from './components/ui/OfflineBanner';
+import NetworkErrorToast from './components/ui/NetworkErrorToast';
+import SkipNavigation from './components/a11y/SkipNavigation';
+import NotificationCenter from './components/notifications/NotificationCenter';
+import LiveRegion from './components/a11y/LiveRegion';
+import AccessibilityPanel from './components/a11y/AccessibilityPanel';
+import CookieBanner from './components/compliance/CookieBanner';
+import TermsAcceptance from './components/compliance/TermsAcceptance';
+import { useReviews } from './hooks/useReviews';
+import { usePerformance } from './hooks/usePerformance';
+import { useReviews } from './hooks/useReviews';
+import { preloadCriticalResources } from './utils/performance.utils';
+import MentorWallet from './pages/MentorWallet';
 
-const loadPortfolio = () => import("./pages/Portfolio");
-const loadMentorOnboarding = () => import("./components/onboarding/MentorOnboarding");
-const loadLearnerOnboarding = () => import("./pages/LearnerOnboarding");
-const loadMentorWallet = () => import("./pages/MentorWallet");
-const loadMentorSearch = () => import("./pages/MentorSearch");
-const loadMentorSessions = () => import("./pages/MentorSessions");
-const loadSettings = () => import("./pages/Settings");
-const loadMentorProfileSetup = () => import("./pages/MentorProfileSetup");
-const loadLearningGoals = () => import("./pages/LearningGoals");
-const loadGovernance = () => import("./pages/Governance");
-const loadProposalDetail = () => import("./pages/ProposalDetail");
-const loadRatingBreakdown = () => import("./components/reviews/RatingBreakdown");
-const loadReviewForm = () => import("./components/reviews/ReviewForm");
-const loadReviewList = () => import("./components/reviews/ReviewList");
-const loadLineChart = () => import("./components/charts/LineChart");
-const loadBarChart = () => import("./components/charts/BarChart");
-const loadPieChart = () => import("./components/charts/PieChart");
-const loadAreaChart = () => import("./components/charts/AreaChart");
-const loadMentorPublicProfile = () => import("./pages/MentorPublicProfile");
-const loadLearnerProfile = () => import("./pages/LearnerProfile");
+const loadMentorOnboarding = () => import('./components/onboarding/MentorOnboarding');
+const loadLearnerOnboarding = () => import('./pages/LearnerOnboarding');
+const loadMentorSearch = () => import('./pages/MentorSearch');
+const loadMentorSessions = () => import('./pages/MentorSessions');
+const loadSettings = () => import('./pages/Settings');
+const loadMentorProfileSetup = () => import('./pages/MentorProfileSetup');
+const loadLearningGoals = () => import('./pages/LearningGoals');
+const loadGovernance = () => import('./pages/Governance');
+const loadProposalDetail = () => import('./pages/ProposalDetail');
+const loadRatingBreakdown = () => import('./components/reviews/RatingBreakdown');
+const loadReviewForm = () => import('./components/reviews/ReviewForm');
+const loadReviewList = () => import('./components/reviews/ReviewList');
+const loadMentorPublicProfile = () => import('./pages/MentorPublicProfile');
+const loadLearnerProfile = () => import('./pages/LearnerProfile');
+const loadCreditScore = () => import('./pages/CreditScore');
+const loadMentorAnalyticsPage = () => import('./pages/MentorAnalytics');
+const loadLearnerAnalyticsPage = () => import('./pages/LearnerAnalytics');
+const loadPlatformStats = () => import('./pages/PlatformStats');
+const loadPrivacyPolicy = () => import('./pages/PrivacyPolicy');
+const loadTermsOfService = () => import('./pages/TermsOfService');
+const loadISAMarketplace = () => import('./pages/ISAMarketplace');
+const loadPortfolio = () => import('./pages/Portfolio');
 
-const Portfolio = lazy(loadPortfolio);
 const MentorPublicProfile = lazy(loadMentorPublicProfile);
 const LearnerProfile = lazy(() =>
   loadLearnerProfile().then((m) => ({ default: m.LearnerProfilePage }))
 );
 const MentorOnboarding = lazy(loadMentorOnboarding);
 const LearnerOnboarding = lazy(loadLearnerOnboarding);
-const MentorWallet = lazy(loadMentorWallet);
 const MentorSearch = lazy(loadMentorSearch);
 const MentorSessions = lazy(loadMentorSessions);
 const Settings = lazy(loadSettings);
@@ -49,19 +53,36 @@ const MentorProfileSetup = lazy(() =>
   loadMentorProfileSetup().then((m) => ({ default: m.MentorProfileSetup }))
 );
 const LearningGoals = lazy(loadLearningGoals);
-const MentorDashboard = lazy(() => import("./pages/MentorDashboard"));
+const MentorDashboard = lazy(loadMentorDashboard);
 const RatingBreakdown = lazy(loadRatingBreakdown);
 const ReviewForm = lazy(loadReviewForm);
 const ReviewList = lazy(loadReviewList);
+
+type AppView =
+  | 'onboarding'
+  | 'learner'
+  | 'wallet'
+  | 'search'
+  | 'reviews'
+  | 'analytics'
+  | 'profile'
+  | 'sessions'
+  | 'settings'
+  | 'goals'
+  | 'dashboard'
+  | 'learner-profile';
 const LineChart = lazy(loadLineChart);
 const BarChart = lazy(loadBarChart);
 const PieChart = lazy(loadPieChart);
 const AreaChart = lazy(loadAreaChart);
+const CreditScore = lazy(loadCreditScore);
 const MentorAnalyticsPage = lazy(loadMentorAnalyticsPage);
 const LearnerAnalyticsPage = lazy(loadLearnerAnalyticsPage);
 const PlatformStatsPage = lazy(loadPlatformStats);
 const PrivacyPolicyPage = lazy(loadPrivacyPolicy);
 const TermsOfServicePage = lazy(loadTermsOfService);
+const ISAMarketplacePage = lazy(loadISAMarketplace);
+const Portfolio = lazy(loadPortfolio);
 
 const TERMS_ACCEPTANCE_KEY = 'mm_terms_acceptance';
 const UNSUPPORTED_COUNTRIES = new Set(['IR', 'KP', 'SY', 'CU']);
@@ -108,83 +129,50 @@ const ratingTrend = [
 
 function AnalyticsDashboard() {
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+    <div className="space-y-6 pb-10">
       <div>
-        <h2 className="text-3xl font-bold mb-1">Analytics</h2>
+        <h2 className="mb-1 text-3xl font-bold">Analytics</h2>
         <p className="text-gray-500">Your platform metrics at a glance.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <MetricCard
-          title="Total Earnings"
-          value="$12,400"
-          change={18.2}
-          changeLabel="vs last month"
-          prefix=""
-        />
-        <MetricCard
-          title="Sessions"
-          value={84}
-          change={12.5}
-          changeLabel="vs last month"
-        />
-        <MetricCard
-          title="Avg. Rating"
-          value="4.8"
-          change={2.1}
-          changeLabel="vs last month"
-          suffix="★"
-        />
-        <MetricCard
-          title="Students"
-          value={136}
-          change={-3.4}
-          changeLabel="vs last month"
-        />
+        <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <div className="text-sm text-gray-500">Total Earnings</div>
+          <div className="mt-2 text-2xl font-bold">$12,400</div>
+        </div>
+        <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <div className="text-sm text-gray-500">Sessions</div>
+          <div className="mt-2 text-2xl font-bold">84</div>
+        </div>
+        <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <div className="text-sm text-gray-500">Avg. Rating</div>
+          <div className="mt-2 text-2xl font-bold">4.8★</div>
+        </div>
+        <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <div className="text-sm text-gray-500">Students</div>
+          <div className="mt-2 text-2xl font-bold">136</div>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <AreaChart
-          data={earningsData}
-          series={[{ key: "earnings", name: "Earnings" }]}
-          title="Monthly Earnings"
-          description="Cumulative earnings over time"
-          xAxisKey="label"
-          valuePrefix="$"
-          exportable
-          exportFilename="earnings-chart"
-        />
-        <LineChart
-          data={ratingTrend}
-          series={[{ key: "rating", name: "Avg Rating" }]}
-          title="Rating Trend"
-          description="Average session rating per month"
-          xAxisKey="label"
-          zoomable
-          exportable
-          exportFilename="rating-trend"
-        />
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <BarChart
-          data={earningsData}
-          series={[{ key: "sessions", name: "Sessions" }]}
-          title="Sessions per Month"
-          xAxisKey="label"
-          exportable
-          exportFilename="sessions-bar"
-        />
-        <PieChart
-          data={sessionsByCategory}
-          title="Sessions by Category"
-          description="Proportional breakdown of session types"
-          donut
-          exportable
-          exportFilename="sessions-pie"
-        />
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-semibold">Performance Summary</h3>
+        <p className="mt-2 text-sm text-gray-600">
+          Track sessions, learner engagement, wallet activity, and profile growth from one place.
+        </p>
       </div>
     </div>
+  );
+}
+
+function SessionJoinDeepLink() {
+  const { token } = useParams<{ token: string }>();
+
+  return (
+    <SessionRoom
+      sessionId={token ?? 'invite'}
+      sessionTopic="MentorMinds Session Invite"
+      mentorName="Mentor"
+    />
   );
 }
 
@@ -193,7 +181,7 @@ function App() {
   const [view, setView] = useState<AppView>("onboarding");
   const [showForm, setShowForm] = useState(false);
   const [a11yOpen, setA11yOpen] = useState(false);
-  const [announcement, setAnnouncement] = useState("");
+  const [announcement, setAnnouncement] = useState('');
   const [networkError, setNetworkError] = useState<string | null>(null);
 
   const { dashboard, budgetStatus } = usePerformance();
@@ -211,11 +199,6 @@ function App() {
     paginate,
   } = useReviews("m1");
 
-  const handleViewChange = (next: AppView, label: string) => {
-    setView(next);
-    setAnnouncement(`Navigated to ${label}`);
-  };
-
   useEffect(() => {
     preloadCriticalResources();
   }, []);
@@ -223,11 +206,11 @@ function App() {
   useEffect(() => {
     const handleNetworkError = (e: Event) => {
       const customEvent = e as CustomEvent<{ message?: string }>;
-      setNetworkError(customEvent.detail?.message || "A network error occurred.");
+      setNetworkError(customEvent.detail?.message || 'A network error occurred.');
     };
 
-    window.addEventListener("api-network-error", handleNetworkError);
-    return () => window.removeEventListener("api-network-error", handleNetworkError);
+    window.addEventListener('api-network-error', handleNetworkError);
+    return () => window.removeEventListener('api-network-error', handleNetworkError);
   }, []);
 
   const preloaders: Record<AppView, () => Promise<unknown>> = {
@@ -243,7 +226,10 @@ function App() {
     settings: loadSettings,
     goals: loadLearningGoals,
     dashboard: () => Promise.resolve(),
-    "learner-profile": loadLearnerProfile,
+    'learner-profile': loadLearnerProfile,
+  const handleViewChange = (next: AppView, label: string) => {
+    setView(next);
+    setAnnouncement(`Navigated to ${label}`);
   };
 
   const fallback = (
@@ -253,7 +239,7 @@ function App() {
   return (
     <div
       className={`min-h-screen bg-gray-50 font-sans text-gray-900 pb-20 ${
-        !isOnline ? "pt-10" : ""
+        !isOnline ? 'pt-10' : ''
       }`}
     >
       <OfflineBanner />
@@ -307,20 +293,22 @@ function App() {
               />
             </svg>
           </button>
+          <div className="flex items-center gap-3">
+            <NotificationCenter />
+          </div>
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar px-1 py-2 md:hidden">
           {[
-            { id: "onboarding", label: "Mentor Onboarding" },
-            { id: "goals", label: "Goals" },
-            { id: "wallet", label: "Wallet" },
-            { id: "portfolio", label: "Portfolio" },
-            { id: "analytics", label: "Analytics" },
-            { id: "reviews", label: "Ratings & Reviews" },
-            { id: "profile", label: "Profile Setup" },
-            { id: "search", label: "Search" },
-            { id: "sessions", label: "Manage Sessions" },
-            { id: "settings", label: "Settings" },
+            { id: 'onboarding', label: 'Mentor Onboarding' },
+            { id: 'goals', label: 'Goals' },
+            { id: 'wallet', label: 'Wallet' },
+            { id: 'analytics', label: 'Analytics' },
+            { id: 'reviews', label: 'Reviews' },
+            { id: 'profile', label: 'Profile' },
+            { id: 'search', label: 'Search' },
+            { id: 'sessions', label: 'Sessions' },
+            { id: 'settings', label: 'Settings' },
           ].map((item) => (
             <button
               key={item.id}
@@ -328,8 +316,8 @@ function App() {
               onClick={() => handleViewChange(item.id as AppView, item.label)}
               className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-bold transition-all ${
                 view === item.id
-                  ? "bg-white text-stellar shadow-sm"
-                  : "text-gray-400 hover:text-gray-600"
+                  ? 'bg-white text-stellar shadow-sm'
+                  : 'text-gray-400 hover:text-gray-600'
               }`}
             >
               {item.label}
@@ -339,28 +327,25 @@ function App() {
 
         <div className="hidden items-center gap-2 rounded-2xl bg-gray-50 p-1 md:flex">
           {[
-            { id: "search", label: "Search & Booking" },
-            { id: "learner", label: "Learner Onboarding" },
-            { id: "onboarding", label: "Mentor Onboarding" },
-            { id: "sessions", label: "Manage Sessions" },
-            { id: "profile", label: "Profile Setup" },
-            { id: "wallet", label: "Wallet" },
-            { id: "portfolio", label: "Portfolio" },
-            { id: "settings", label: "Settings" },
-            { id: "analytics", label: "Analytics" },
-            { id: "reviews", label: "Reviews" },
-            { id: "learner-profile", label: "Learner Profile" },
+            { id: 'search', label: 'Search & Booking' },
+            { id: 'learner', label: 'Learner Onboarding' },
+            { id: 'onboarding', label: 'Mentor Onboarding' },
+            { id: 'sessions', label: 'Manage Sessions' },
+            { id: 'profile', label: 'Profile Setup' },
+            { id: 'wallet', label: 'Wallet' },
+            { id: 'settings', label: 'Settings' },
+            { id: 'analytics', label: 'Analytics' },
+            { id: 'reviews', label: 'Reviews' },
+            { id: 'learner-profile', label: 'Learner Profile' },
           ].map((item) => (
             <button
               key={item.id}
               type="button"
               onClick={() => handleViewChange(item.id as AppView, item.label)}
-              onMouseEnter={() => preloaders[item.id as AppView]?.()}
-              onFocus={() => preloaders[item.id as AppView]?.()}
               className={`rounded-xl px-4 py-2 text-sm font-bold transition-all ${
                 view === item.id
-                  ? "bg-white text-stellar shadow-sm"
-                  : "text-gray-500 hover:text-gray-800"
+                  ? 'bg-white text-stellar shadow-sm'
+                  : 'text-gray-500 hover:text-gray-800'
               }`}
             >
               {item.label}
@@ -404,6 +389,14 @@ function App() {
             element={
               <Suspense fallback={fallback}>
                 <MentorSessions isOnline={isOnline} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/sessions/join/:token"
+            element={
+              <Suspense fallback={fallback}>
+                <SessionJoinDeepLink />
               </Suspense>
             }
           />
@@ -456,6 +449,22 @@ function App() {
             }
           />
           <Route
+            path="/isa-marketplace"
+            element={
+              <Suspense fallback={fallback}>
+                <ISAMarketplacePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/portfolio"
+            element={
+              <Suspense fallback={fallback}>
+                <Portfolio />
+              </Suspense>
+            }
+          />
+          <Route
             path="/mentors/:id"
             element={
               <Suspense fallback={fallback}>
@@ -476,6 +485,14 @@ function App() {
             element={
               <Suspense fallback={fallback}>
                 <Governance />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/credit-score"
+            element={
+              <Suspense fallback={fallback}>
+                <CreditScore />
               </Suspense>
             }
           />
@@ -509,20 +526,13 @@ function App() {
                   ) : view === "learner-profile" ? (
                     <LearnerProfile />
                   ) : (
-                    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="space-y-10">
                       <div className="flex items-end justify-between">
                         <div>
                           <h2 className="mb-2 text-3xl font-bold">
                             Mentor Feedback
                             {!isOnline && (
                               <span className="ml-3 inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
-                                <svg
-                                  className="mr-1.5 h-2 w-2 text-amber-400"
-                                  fill="currentColor"
-                                  viewBox="0 0 8 8"
-                                >
-                                  <circle cx="4" cy="4" r="3" />
-                                </svg>
                                 Offline Cache
                               </span>
                             )}
@@ -538,10 +548,10 @@ function App() {
                           disabled={!isOnline}
                           aria-expanded={showForm}
                           aria-controls="review-form"
-                          className={`rounded-xl px-6 py-2.5 font-bold shadow-lg transition-all ${
+                          className={`rounded-xl px-6 py-2.5 font-bold transition-all ${
                             !isOnline
-                              ? "cursor-not-allowed bg-gray-200 text-gray-400 shadow-none"
-                              : "bg-stellar text-white shadow-stellar/20 hover:bg-stellar-dark"
+                              ? 'cursor-not-allowed bg-gray-200 text-gray-400'
+                              : 'bg-stellar text-white hover:bg-stellar-dark'
                           }`}
                         >
                           {showForm ? "Cancel Review" : "Write a Review"}
@@ -551,8 +561,11 @@ function App() {
                       {showForm && (
                         <div id="review-form">
                           <ReviewForm
-                            onSubmit={(data) => {
-                              addReview({ ...data, reviewerId: `user-${Date.now()}` });
+                            onSubmit={(data: any) => {
+                              addReview({
+                                ...data,
+                                reviewerId: `user-${Date.now()}`,
+                              });
                               setShowForm(false);
                               setAnnouncement("Your review has been submitted.");
                             }}
@@ -585,6 +598,9 @@ function App() {
         </Routes>
       </main>
 
+      <InstallPrompt />
+      <MobileDashboard />
+
       <aside className="fixed bottom-16 left-4 z-40 hidden w-72 rounded-[1.5rem] border border-gray-100 bg-white/95 p-4 shadow-xl backdrop-blur md:block">
         <div className="text-xs font-bold uppercase tracking-[0.18em] text-stellar">
           Performance Monitor
@@ -598,7 +614,7 @@ function App() {
                   {item.label}
                 </div>
                 <div className="mt-1 text-sm font-black text-gray-900">
-                  {item.value ?? "--"}
+                  {item.value ?? '--'}
                   {item.unit}
                 </div>
               </div>

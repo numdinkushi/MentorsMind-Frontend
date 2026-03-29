@@ -1,98 +1,37 @@
-import { useState } from "react";
-import { AssetRow } from "../components/wallet/AssetRow";
-import { PortfolioChart } from "../components/wallet/PortfolioChart";
-import { SendModal } from "../components/wallet/SendModal";
-import { ReceiveModal } from "../components/wallet/ReceiveModal";
-import { usePortfolio } from "../hooks/usePortfolio";
+import React from 'react';
+import { useMentorProfile } from '../hooks/useMentorProfile';
+import { PortfolioSection } from '../components/mentor/PortfolioSection';
+import { useTransactionLimits } from '../hooks/useTransactionLimits';
+import LimitUsage from '../components/compliance/LimitUsage';
 
-export default function Portfolio() {
-  const {
-    assets,
-    totalValue,
-    sortBy,
-    setSortBy,
-    loading,
-    lastUpdated,
-    refreshPortfolio,
-    toggleTrustline,
-  } = usePortfolio();
-
-  const [sendAsset, setSendAsset] = useState<string | null>(null);
-  const [receiveAsset, setReceiveAsset] = useState<string | null>(null);
+const Portfolio: React.FC = () => {
+  const { profile, addPortfolioItem, removePortfolioItem } = useMentorProfile();
+  const { daily, monthly, tooltipText, history, kycUrl } = useTransactionLimits();
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold">Portfolio</h1>
-
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <select
-            value={sortBy}
-            onChange={(e) =>
-              setSortBy(e.target.value as "value" | "name" | "change")
-            }
-            className="px-3 py-2 border rounded"
-          >
-            <option value="value">Sort by Value</option>
-            <option value="name">Sort by Name</option>
-            <option value="change">Sort by 24h Change</option>
-          </select>
-
-          <button
-            onClick={refreshPortfolio}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Refresh
-          </button>
-        </div>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      <div>
+        <h2 className="text-3xl font-bold mb-1">Portfolio</h2>
+        <p className="text-gray-500">Showcase your work and monitor compliance limits.</p>
       </div>
 
-      <div className="bg-gray-100 p-6 rounded-xl">
-        <p className="text-gray-500">Total Portfolio Value</p>
-        <h2 className="text-3xl font-bold">${totalValue.toFixed(2)}</h2>
-        <p className="text-sm text-gray-400">
-          Last updated: {lastUpdated.toLocaleTimeString()}
-        </p>
-      </div>
+      <LimitUsage
+        daily={daily}
+        monthly={monthly}
+        tooltipText={tooltipText}
+        history={history}
+        kycUrl={kycUrl}
+      />
 
-      <PortfolioChart assets={assets} />
-
-      <div className="space-y-3">
-        <h3 className="text-lg font-semibold">Assets</h3>
-
-        {loading
-          ? Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-24 rounded-xl bg-gray-200 animate-pulse"
-              />
-            ))
-          : assets.map((asset) => (
-              <AssetRow
-                key={asset.id}
-                icon={asset.icon}
-                name={asset.name}
-                balance={asset.balance}
-                usdValue={asset.usdValue}
-                change24h={asset.change24h}
-                trusted={asset.trusted}
-                onSend={() => setSendAsset(asset.name)}
-                onReceive={() => setReceiveAsset(asset.name)}
-                onToggleTrustline={() => toggleTrustline(asset.id)}
-              />
-            ))}
-      </div>
-
-      {sendAsset && (
-        <SendModal assetName={sendAsset} onClose={() => setSendAsset(null)} />
-      )}
-
-      {receiveAsset && (
-        <ReceiveModal
-          assetName={receiveAsset}
-          onClose={() => setReceiveAsset(null)}
+      <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+        <PortfolioSection
+          items={profile.portfolio}
+          onAdd={addPortfolioItem}
+          onRemove={removePortfolioItem}
         />
-      )}
+      </div>
     </div>
   );
-}
+};
+
+export default Portfolio;
